@@ -29,12 +29,40 @@ avgTotalSteps <- aggregate(df$steps, by = list(df$date), FUN = sum)
 colnames(avgTotalSteps) <- c("Date","Total")
 ```
 Make a histogram of the total number of steps taken each day
-```
+``` {r echo = FALSE}
+data <- read.csv("activity.csv")
+df <- data.frame(data)
+df <- na.omit(df)
+avgTotalSteps <- aggregate(df$steps, by = list(df$date), FUN = sum)
+colnames(avgTotalSteps) <- c("Date","Total")
 hist(avgTotalSteps$Total, xlab = "Average Total Steps", main = "Histogram")
 ```
+
+
 Calculate and report the mean and median of the total number of steps taken per day
-```
+
+Mean
+``` {r echo = FALSE}
+library(ggplot2)
+library(magrittr)
+library(knitr)
+data <- read.csv("activity.csv")
+df <- data.frame(data)
+df <- na.omit(df)
+avgTotalSteps <- aggregate(df$steps, by = list(df$date), FUN = sum)
+colnames(avgTotalSteps) <- c("Date","Total")
 mean(avgTotalSteps$Total)
+```
+Median
+``` {r echo = FALSE}
+library(ggplot2)
+library(magrittr)
+library(knitr)
+data <- read.csv("activity.csv")
+df <- data.frame(data)
+df <- na.omit(df)
+avgTotalSteps <- aggregate(df$steps, by = list(df$date), FUN = sum)
+colnames(avgTotalSteps) <- c("Date","Total")
 median(avgTotalSteps$Total)
 ```
 ## What is the average daily activity pattern?
@@ -49,13 +77,26 @@ axis(2)
 
 avgStepsPerInterval[which.max(avgStepsPerInterval$Average),]
 ```
-## Imputing missing values
-```
-dfNA <- data.frame(data)
-sum(is.na(dfNA$steps))
-```
 ## Strategy for filling in all missing values in dataset
+```{r}
+data <- read.csv("activity.csv")
+df <- data.frame(data)
+df <- na.omit(df)
+avgSteps <- aggregate(df$steps, list(interval = as.numeric(as.character(df$interval))), FUN = "mean")
+imputed <- data 
+for (i in 1:nrow(imputed)) {
+  if (is.na(imputed$steps[i])) {
+    imputed$steps[i] <- avgSteps[which(imputed$interval[i] == avgSteps$interval), ]$x
+  }
+}
+imputed$date <- as.Date(imputed$date)
 ```
+
+Mean
+```{r echo = FALSE}
+data <- read.csv("activity.csv")
+df <- data.frame(data)
+df <- na.omit(df)
 avgSteps <- aggregate(df$steps, list(interval = as.numeric(as.character(df$interval))), FUN = "mean")
 imputed <- data 
 for (i in 1:nrow(imputed)) {
@@ -69,12 +110,59 @@ gg <- gg + geom_bar (stat = "identity",color = "orange", fill = "orange", size =
 gg <- gg + labs(title = "Histogram",x = "Date",y = "Total number of steps")
 print(gg)
 filledTotalSteps <- aggregate(imputed$steps, list (Date = imputed$date), FUN = "sum")$x
-mean(filledTotalSteps)
-median(filledTotalSteps)
 ```
 
-## Are there differences in activity patterns between weekdays and weekends?
+Mean
+```{r echo = FALSE}
+data <- read.csv("activity.csv")
+df <- data.frame(data)
+df <- na.omit(df)
+avgSteps <- aggregate(df$steps, list(interval = as.numeric(as.character(df$interval))), FUN = "mean")
+imputed <- data 
+for (i in 1:nrow(imputed)) {
+  if (is.na(imputed$steps[i])) {
+    imputed$steps[i] <- avgSteps[which(imputed$interval[i] == avgSteps$interval), ]$x
+  }
+}
+imputed$date <- as.Date(imputed$date)
+filledTotalSteps <- aggregate(imputed$steps, list (Date = imputed$date), FUN = "sum")$x
+mean(filledTotalSteps)
 ```
+
+Median
+```{r echo = FALSE}
+data <- read.csv("activity.csv")
+df <- data.frame(data)
+df <- na.omit(df)
+avgSteps <- aggregate(df$steps, list(interval = as.numeric(as.character(df$interval))), FUN = "mean")
+imputed <- data 
+for (i in 1:nrow(imputed)) {
+  if (is.na(imputed$steps[i])) {
+    imputed$steps[i] <- avgSteps[which(imputed$interval[i] == avgSteps$interval), ]$x
+  }
+}
+imputed$date <- as.Date(imputed$date)
+filledTotalSteps <- aggregate(imputed$steps, list (Date = imputed$date), FUN = "sum")$x
+median(filledTotalSteps)
+```
+## Are there differences in activity patterns between weekdays and weekends?
+```{r echo = FALSE}
+library(ggplot2)
+library(magrittr)
+library(dplyr)
+library(knitr)
+data <- read.csv("activity.csv")
+df <- data.frame(data)
+df <- na.omit(df)
+avgSteps <- aggregate(df$steps, list(interval = as.numeric(as.character(df$interval))), FUN = "mean")
+imputed <- data 
+for (i in 1:nrow(imputed)) {
+  if (is.na(imputed$steps[i])) {
+    imputed$steps[i] <- avgSteps[which(imputed$interval[i] == avgSteps$interval), ]$x
+  }
+}
+imputed$date <- as.Date(imputed$date)
+
 dfDay <- imputed
 
 dfDay <- dfDay %>%
